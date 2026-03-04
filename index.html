@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Choix de classe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #e9efff, #f7f7f7);
+      animation: fadeInBody 0.5s ease;
+    }
+
+    .card {
+      background: white;
+      padding: 26px;
+      border-radius: 14px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
+      width: 340px;
+      animation: popIn 0.45s ease;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-top: 0;
+      margin-bottom: 18px;
+      color: #1f2937;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: #374151;
+      font-weight: 600;
+    }
+
+    select,
+    button {
+      width: 100%;
+      padding: 11px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    button {
+      margin-top: 14px;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+      border: none;
+      font-weight: 700;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .hint {
+      margin-top: 10px;
+      margin-bottom: 0;
+      font-size: 13px;
+      color: #6b7280;
+      text-align: center;
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes fadeInBody {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Je suis un élève de</h1>
+
+    <form id="classeForm">
+      <label for="classe">Choisis ta classe :</label>
+      <select id="classe" name="classe" required>
+        <option value="" disabled selected>-- Sélectionner --</option>
+        <option value="2">tstmg2</option>
+        <option value="3">tstmg3</option>
+        <option value="prive">privé</option>
+      </select>
+
+      <button type="submit">Valider</button>
+      <p class="hint">Si tu choisis "privé", un mot de passe sera demandé.</p>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('classeForm');
+    const select = document.getElementById('classe');
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      if (select.value === '2') {
+        window.location.href = '2.html';
+      } else if (select.value === '3') {
+        window.location.href = '3.html';
+      } else if (select.value === 'prive') {
+        const mdp = prompt('Mot de passe :');
+
+        if (mdp === 'NC') {
+          window.location.href = 'prive.html';
+        } else {
+          alert('Mot de passe incorrect.');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
