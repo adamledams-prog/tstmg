@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Choix des photos</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #d70000;
+      padding: 20px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    h1 {
+      color: white;
+      font-size: 48px;
+      text-align: center;
+      margin: 20px 0 10px 0;
+      animation: slideUp 0.4s ease;
+    }
+
+    .student-name {
+      color: white;
+      font-size: 20px;
+      text-align: center;
+      margin: 0 0 30px 0;
+      opacity: 0.9;
+      animation: slideUp 0.5s ease;
+    }
+
+    .submit-container {
+      text-align: center;
+      margin: 40px auto;
+      padding: 20px;
+      max-width: 600px;
+    }
+
+    .submit-button {
+      display: none;
+      padding: 16px 32px;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+    }
+
+    .submit-button.visible {
+      display: inline-block;
+    }
+
+    .submit-button:hover {
+      background: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
+    }
+
+    .submit-button:disabled {
+      background: #6b7280;
+      cursor: not-allowed;
+      animation: none;
+    }
+
+    .locked-message {
+      display: none;
+      padding: 16px 24px;
+      background: #fef3c7;
+      color: #92400e;
+      border: 2px solid #fbbf24;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .locked-message.visible {
+      display: block;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .photos-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .photos-row {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .pdf-container {
+      width: 250px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.6s ease;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .image-wrapper {
+      height: 350px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .pdf-container .label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px;
+      font-size: 11px;
+      text-align: center;
+      z-index: 10;
+    }
+
+    .vote-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #fbbf24;
+      color: #1f2937;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 14px;
+      z-index: 15;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    iframe, img {
+      width: 100%;
+      height: 100%;
+      border: none;
+      object-fit: contain;
+    }
+
+    .vote-button {
+      width: 100%;
+      padding: 12px;
+      background: #10b981;
+      color: white;
+      border: none;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .vote-button:hover {
+      background: #059669;
+    }
+
+    .vote-button.voted {
+      background: #6b7280;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      max-width: 400px;
+      width: 90%;
+      animation: modalPop 0.3s ease;
+    }
+
+    @keyframes modalPop {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal h2 {
+      margin: 0 0 20px 0;
+      color: #1f2937;
+      font-size: 22px;
+      text-align: center;
+    }
+
+    .vote-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .comment-section {
+      margin: 20px 0;
+    }
+
+    .comment-section label {
+      display: block;
+      margin-bottom: 8px;
+      color: #374151;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .comment-section textarea {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: Arial, sans-serif;
+      resize: vertical;
+      min-height: 80px;
+      box-sizing: border-box;
+    }
+
+    .comment-section textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    .vote-option {
+      padding: 16px;
+      background: #f3f4f6;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      transition: all 0.2s ease;
+      color: #1f2937;
+    }
+
+    .vote-option:hover {
+      background: #e5e7eb;
+      border-color: #2563eb;
+      transform: translateX(5px);
+    }
+
+    .vote-option.first {
+      background: #fef3c7;
+      border-color: #fbbf24;
+    }
+
+    .vote-option.first:hover {
+      background: #fde68a;
+    }
+
+    .vote-option.second {
+      background: #e0e7ff;
+      border-color: #818cf8;
+    }
+
+    .vote-option.second:hover {
+      background: #c7d2fe;
+    }
+
+    .vote-option.third {
+      background: #fecaca;
+      border-color: #f87171;
+    }
+
+    .vote-option.third:hover {
+      background: #fca5a5;
+    }
+
+    .modal-close {
+      margin-top: 16px;
+      padding: 10px;
+      background: #e5e7eb;
+      color: #374151;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      width: 100%;
+    }
+
+    .modal-close:hover {
+      background: #d1d5db;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Choisis les 3 meilleures affiches</h1>
+  <p class="student-name" id="studentDisplay">Connecté en tant que : <span id="studentNameDisplay"></span></p>
+  
+  <div class="submit-container">
+    <button id="submitVotes" class="submit-button" onclick="finalizeVotes()">📨 Envoyer mes votes</button>
+    <div id="lockedMessage" class="locked-message">🔒 Votes envoyés et verrouillés</div>
+  </div>
+  
+  <div class="photos-container">
+    <!-- Ligne 1 -->
+    <div class="photos-row">
+      <div class="pdf-container" data-id="1">
+        <div class="image-wrapper">
+          <img src="imageststmg3/AIELLO_Johan_09-03.png" alt="Affiche">
+        </div>
+        <button class="vote-button" onclick="openVoteModal(1)">Voter</button>
+      </div>
+      <div class="pdf-container" data-id="2">
+        <div class="image-wrapper">
+          <iframe src="imageststmg3/BEN ABDELMOULA_Amine_09-03.pdf#toolbar=0&navpanes=0&scrollbar=0"></iframe>
+        </div>
+        <button class="vote-button" onclick="openVoteModal(2)">Voter</button>
+      </div>
+      <div class="pdf-container" data-id="3">
+        <div class="image-wrapper">
+          <img src="imageststmg3/BEN HADJ SAAD_Arcelane_09-03.png" alt="Affiche">
+        </div>
+        <button class="vote-button" onclick="openVoteModal(3)">Voter</button>
+      </div>
+    </div>
+
+    <!-- Ligne 2 -->
+    <div class="photos-row">
+      <div class="pdf-container" data-id="4">
+        <div class="image-wrapper">
+          <iframe src="imageststmg3/BERGACHI_Rania_09-03.pdf#toolbar=0&navpanes=0&scrollbar=0"></iframe>
+        </div>
+        <button class="vote-button" onclick="openVoteModal(4)">Voter</button>
+      </div>
+      <div class="pdf-container" data-id="5">
+        <div class="image-wrapper">
+          <iframe src="imageststmg3/BRAMKI_Rayyan_09-03.pdf#toolbar=0&navpanes=0&scrollbar=0"></iframe>
+        </div>
+        <button class="vote-button" onclick="openVoteModal(5)">Voter</button>
+      </div>
+      <div class="pdf-container" data-id="6">
+        <div class="image-wrapper">
+          <img src="imageststmg3/COUTELLIER_Ella_09-03.png" alt="Affiche">
+        </div>
+        <button class="vote-button" onclick="openVoteModal(6)">Voter</button>
+      </div>
+    </div>
+
+    <!-- Ligne 3 -->
+    <div class="photos-row">
+      <div class="pdf-container" data-id="7">
+        <div class="image-wrapper">
+          <iframe src="imageststmg3/DARMON_Shanon_09-03.pdf#toolbar=0&navpanes=0&scrollbar=0"></iframe>
+        </div>
+        <button class="vote-button" onclick="openVoteModal(7)">Voter</button>
+      </div>
+      <div class="pdf-container" data-id="8">
+        <div class="image-wrapper">
+          <img src="imageststmg3/GERARD-BENHAIM_Sacha_09-03.png" alt="Affiche">
+        </div>
+        <button class="vote-button" onclick="openVoteModal(8)">Voter</button>
+      </div>
+      <div class="pdf-container" data-id="9">
+        <div class="image-wrapper">
+          <img src="imageststmg3/GONZALEZ_Emma_09-03.png" alt="Affiche">
+        </div>
+        <button class="vote-button" onclick="openVoteModal(9)">Voter</button>
+      </div>
+    </div>
+
+    <!-- Ligne 4 -->
+    <div class="photos-row">
+      <div class="pdf-container" data-id="10">
+        <div class="image-wrapper">
+          <iframe src="imageststmg3/HAMIDA_Rokaïa_09-03.pdf#toolbar=0&navpanes=0&scrollbar=0"></iframe>
+        </div>
+        <button class="vote-button" onclick="openVoteModal(10)">Voter</button>
+      </div>
+      <div class="pdf-container" data-id="11">
+        <div class="image-wrapper">
+          <img src="imageststmg3/HEDHILI_Lisa_09-03.png" alt="Affiche">
+        </div>
+        <button class="vote-button" onclick="openVoteModal(11)">Voter</button>
+      </div>
+      <div class="pdf-container" data-id="12">
+        <div class="image-wrapper">
+          <iframe src="imageststmg3/HERMETZ-BOSCHER_Lorenzo_09-03.pdf#toolbar=0&navpanes=0&scrollbar=0"></iframe>
+        </div>
+        <button class="vote-button" onclick="openVoteModal(12)">Voter</button>
+      </div>
+    </div>
+
+    <!-- Ligne 5 -->
+    <div class="photos-row">
+      <div class="pdf-container" data-id="13">
+        <div class="image-wrapper">
+          <img src="imageststmg3/Image1.png" alt="Affiche">
+        </div>
+        <button class="vote-button" onclick="openVoteModal(13)">Voter</button>
+      </div>
+      <div class="pdf-container" data-id="14">
+        <div class="image-wrapper">
+          <img src="imageststmg3/LANTOINE_Travis_09-03.png" alt="Affiche">
+        </div>
+        <button class="vote-button" onclick="openVoteModal(14)">Voter</button>
+      </div>
+      <div class="pdf-container" data-id="15">
+        <div class="image-wrapper">
+          <iframe src="imageststmg3/LAYOUNI_Yacin_09-03.pdf#toolbar=0&navpanes=0&scrollbar=0"></iframe>
+        </div>
+        <button class="vote-button" onclick="openVoteModal(15)">Voter</button>
+      </div>
+    </div>
+
+    <!-- Ligne 6 -->
+    <div class="photos-row">
+      <div class="pdf-container" data-id="16">
+        <div class="image-wrapper">
+          <iframe src="imageststmg3/MABROUK_Selma_09-03.pdf#toolbar=0&navpanes=0&scrollbar=0"></iframe>
+        </div>
+        <button class="vote-button" onclick="openVoteModal(16)">Voter</button>
+      </div>
+      <div class="pdf-container" data-id="17">
+        <div class="image-wrapper">
+          <img src="imageststmg3/PIET_Virgile_09-03.jpeg" alt="Affiche">
+        </div>
+        <button class="vote-button" onclick="openVoteModal(17)">Voter</button>
+      </div>
+      <div class="pdf-container" data-id="18">
+        <div class="image-wrapper">
+          <img src="imageststmg3/RAYMOND--MAÂOUI_Esteban_09-03.png" alt="Affiche">
+        </div>
+        <button class="vote-button" onclick="openVoteModal(18)">Voter</button>
+      </div>
+    </div>
+
+    <!-- Ligne 7 -->
+    <div class="photos-row">
+      <div class="pdf-container" data-id="19">
+        <div class="image-wrapper">
+          <img src="imageststmg3/SEBA_Lila_09-03.png" alt="Affiche">
+        </div>
+        <button class="vote-button" onclick="openVoteModal(19)">Voter</button>
+      </div>
+      <div class="pdf-container" data-id="20">
+        <div class="image-wrapper">
+          <iframe src="imageststmg3/TRAMICHEL--GARDEL_Jean_09-03.pdf#toolbar=0&navpanes=0&scrollbar=0"></iframe>
+        </div>
+        <button class="vote-button" onclick="openVoteModal(20)">Voter</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="voteModal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Voter pour cette affiche</h2>
+      <div class="vote-options">
+        <div class="vote-option first" data-rank="1er" onclick="confirmVote('1er')">🥇 1er</div>
+        <div class="vote-option second" data-rank="2ème" onclick="confirmVote('2ème')">🥈 2ème</div>
+        <div class="vote-option third" data-rank="3ème" onclick="confirmVote('3ème')">🥉 3ème</div>
+      </div>
+      <div class="comment-section">
+        <label for="voteComment">Explique les raisons de ton choix (optionnel)</label>
+        <textarea id="voteComment" placeholder="Pourquoi as-tu choisi cette affiche ?"></textarea>
+      </div>
+      <button class="modal-close" onclick="closeVoteModal()">Annuler</button>
+    </div>
+  </div>
+
+  <script>
+    // Récupérer le nom de l'élève depuis l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentName = urlParams.get('student') || 'Utilisateur';
+    
+    console.log('Student name récupéré:', studentName);
+    console.log('Clé localStorage:', `votes_${studentName}`);
+    
+    // Afficher le nom de l'élève (déjà décodé par URLSearchParams)
+    document.getElementById('studentNameDisplay').textContent = studentName;
+    
+    let currentVoteId = null;
+    let selectedRank = '';
+    const votes = {};
+    const usedRanks = {}; // Suivre quels rangs sont utilisés
+    let votesLocked = false;
+
+    // Fonction pour sauvegarder les votes dans localStorage
+    function saveVotes() {
+      const voteData = {
+        studentName: studentName,
+        votes: votes,
+        usedRanks: usedRanks,
+        locked: votesLocked,
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem(`votes_${studentName}`, JSON.stringify(voteData));
+      console.log('✓ Votes sauvegardés pour', studentName, ':', voteData);
+      updateDebugInfo();
+      updateSubmitButton();
+    }
+
+    // Fonction pour afficher/masquer le bouton d'envoi
+    function updateSubmitButton() {
+      const submitButton = document.getElementById('submitVotes');
+      const lockedMessage = document.getElementById('lockedMessage');
+      const voteCount = Object.keys(votes).length;
+      
+      if (votesLocked) {
+        submitButton.classList.remove('visible');
+        lockedMessage.classList.add('visible');
+      } else if (voteCount === 3) {
+        submitButton.classList.add('visible');
+        lockedMessage.classList.remove('visible');
+      } else {
+        submitButton.classList.remove('visible');
+        lockedMessage.classList.remove('visible');
+      }
+    }
+
+    // Fonction pour finaliser et verrouiller les votes
+    function finalizeVotes() {
+      const voteCount = Object.keys(votes).length;
+      
+      if (voteCount !== 3) {
+        alert('⚠️ Tu dois voter pour exactement 3 affiches avant d\'envoyer.');
+        return;
+      }
+      
+      const confirmation = confirm(
+        '⚠️ ATTENTION\n\n' +
+        'Tu ne pourras plus changer de vote après avoir confirmé.\n\n' +
+        'Es-tu sûr(e) de vouloir envoyer tes 3 votes ?'
+      );
+      
+      if (confirmation) {
+        votesLocked = true;
+        saveVotes();
+        
+        // Désactiver tous les boutons de vote
+        document.querySelectorAll('.vote-button').forEach(btn => {
+          btn.disabled = true;
+          btn.style.cursor = 'not-allowed';
+          btn.style.opacity = '0.6';
+        });
+        
+        alert('✅ Votes envoyés avec succès !\n\nTes votes sont maintenant verrouillés.');
+        updateSubmitButton();
+      }
+    }
+
+    // Fonction pour mettre à jour l'affichage de débogage
+    function updateDebugInfo() {
+      const debugElement = document.getElementById('debugVotes');
+      if (debugElement) {
+        const voteCount = Object.keys(votes).length;
+        debugElement.textContent = `Votes: ${voteCount} | Rangs: ${Object.keys(usedRanks).join(', ')}`;
+      }
+    }
+
+    // Fonction pour charger les votes depuis localStorage
+    function loadVotes() {
+      const savedData = localStorage.getItem(`votes_${studentName}`);
+      console.log('Tentative de chargement des votes pour:', studentName);
+      console.log('Données sauvegardées:', savedData);
+      
+      if (savedData) {
+        try {
+          const voteData = JSON.parse(savedData);
+          
+          // Vider les anciens votes et recharger
+          Object.keys(votes).forEach(key => delete votes[key]);
+          Object.keys(usedRanks).forEach(key => delete usedRanks[key]);
+          
+          // Charger les votes et rangs utilisés
+          Object.assign(votes, voteData.votes);
+          Object.assign(usedRanks, voteData.usedRanks);
+          votesLocked = voteData.locked || false;
+          
+          console.log('Votes à restaurer:', votes);
+          
+          // D'abord, nettoyer tous les badges existants
+          document.querySelectorAll('.vote-badge').forEach(badge => badge.remove());
+          document.querySelectorAll('.vote-button.voted').forEach(btn => {
+            btn.textContent = 'Voter';
+            btn.classList.remove('voted');
+            btn.removeAttribute('title');
+          });
+          
+          // Mettre à jour l'affichage pour tous les votes sauvegardés
+          Object.keys(votes).forEach(id => {
+            const vote = votes[id];
+            const container = document.querySelector(`[data-id="${id}"]`);
+            console.log(`Restauration vote pour affiche ${id}:`, vote, 'Container trouvé:', !!container);
+            
+            if (container) {
+              const button = container.querySelector('.vote-button');
+              const imageWrapper = container.querySelector('.image-wrapper');
+              
+              // Ajouter le badge
+              const badge = document.createElement('div');
+              badge.className = 'vote-badge';
+              badge.textContent = vote.rank;
+              if (vote.comment) {
+                badge.title = vote.comment;
+                badge.style.cursor = 'help';
+              }
+              imageWrapper.appendChild(badge);
+              
+              // Changer le bouton
+              button.textContent = 'Voté : ' + vote.rank;
+              button.classList.add('voted');
+              if (vote.comment) {
+                button.title = vote.comment;
+              }
+            }
+          });
+          
+          console.log('✓ Votes chargés pour', studentName, '- Total:', Object.keys(votes).length);
+          updateDebugInfo();
+          updateSubmitButton();
+          
+          // Si les votes sont verrouillés, désactiver les boutons
+          if (votesLocked) {
+            document.querySelectorAll('.vote-button').forEach(btn => {
+              btn.disabled = true;
+              btn.style.cursor = 'not-allowed';
+              btn.style.opacity = '0.6';
+            });
+          }
+        } catch (e) {
+          console.error('Erreur lors du chargement des votes:', e);
+        }
+      } else {
+        console.log('Aucune donnée de vote trouvée pour:', studentName);
+        updateDebugInfo();
+        updateSubmitButton();
+      }
+    }
+
+    function openVoteModal(id) {
+      if (votesLocked) {
+        alert('🔒 Tes votes sont verrouillés. Tu ne peux plus les modifier.');
+        return;
+      }
+      
+      currentVoteId = id;
+      document.getElementById('modalTitle').textContent = 'Voter pour cette affiche';
+      
+      // Réinitialiser le commentaire
+      const commentField = document.getElementById('voteComment');
+      if (votes[id] && votes[id].comment) {
+        commentField.value = votes[id].comment;
+      } else {
+        commentField.value = '';
+      }
+      
+      document.getElementById('voteModal').classList.add('active');
+    }
+
+    function closeVoteModal() {
+      document.getElementById('voteModal').classList.remove('active');
+      currentVoteId = null;
+      selectedRank = '';
+    }
+
+    function confirmVote(rank) {
+      selectedRank = rank;
+      const commentField = document.getElementById('voteComment');
+      const comment = commentField.value.trim();
+      
+      // Si l'image actuelle avait déjà un vote, libérer l'ancien rang
+      if (votes[currentVoteId]) {
+        const oldRank = votes[currentVoteId].rank;
+        delete usedRanks[oldRank];
+      }
+      
+      // Si ce rang était déjà attribué à une autre affiche, la retirer
+      if (usedRanks[rank] && usedRanks[rank] !== currentVoteId) {
+        const oldImageId = usedRanks[rank];
+        
+        // Retirer le vote de l'ancienne affiche
+        delete votes[oldImageId];
+        
+        // Retirer visuellement le badge et réinitialiser le bouton
+        const oldContainer = document.querySelector(`[data-id="${oldImageId}"]`);
+        if (oldContainer) {
+          const oldBadge = oldContainer.querySelector('.vote-badge');
+          if (oldBadge) oldBadge.remove();
+          
+          const oldButton = oldContainer.querySelector('.vote-button');
+          oldButton.textContent = 'Voter';
+          oldButton.classList.remove('voted');
+          oldButton.removeAttribute('title');
+        }
+      }
+      
+      // Enregistrer le vote avec le commentaire
+      votes[currentVoteId] = { 
+        rank: rank,
+        comment: comment 
+      };
+      usedRanks[rank] = currentVoteId;
+      
+      // Sauvegarder dans localStorage
+      saveVotes();
+      
+      // Mettre à jour l'affichage de l'affiche actuelle
+      const container = document.querySelector(`[data-id="${currentVoteId}"]`);
+      const button = container.querySelector('.vote-button');
+      const imageWrapper = container.querySelector('.image-wrapper');
+      
+      // Retirer ancien badge s'il existe
+      const oldBadge = imageWrapper.querySelector('.vote-badge');
+      if (oldBadge) oldBadge.remove();
+      
+      // Ajouter nouveau badge
+      const badge = document.createElement('div');
+      badge.className = 'vote-badge';
+      badge.textContent = rank;
+      if (comment) {
+        badge.title = comment;
+        badge.style.cursor = 'help';
+      }
+      imageWrapper.appendChild(badge);
+      
+      // Changer le bouton
+      button.textContent = 'Voté : ' + rank;
+      button.classList.add('voted');
+      if (comment) {
+        button.title = comment;
+      }
+      
+      closeVoteModal();
+    }
+
+    // Fermer la modal en cliquant en dehors
+    document.getElementById('voteModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeVoteModal();
+      }
+    });
+
+    // Charger les votes sauvegardés au démarrage
+    // Utiliser un léger délai pour s'assurer que tous les éléments sont prêts
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM chargé via DOMContentLoaded');
+        setTimeout(loadVotes, 100);
+      });
+    } else {
+      // DOM déjà chargé
+      console.log('DOM déjà chargé, chargement immédiat des votes');
+      setTimeout(loadVotes, 100);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suppression vote</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #d70000;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 400px;
+    }
+    h1 {
+      color: #1f2937;
+      margin-top: 0;
+    }
+    .message {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-weight: 600;
+    }
+    .success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 2px solid #10b981;
+    }
+    .info {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 2px solid #3b82f6;
+    }
+    button {
+      padding: 12px 24px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    .delete-btn {
+      background: #dc2626;
+    }
+    .delete-btn:hover {
+      background: #b91c1c;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🗑️ Suppression de vote</h1>
+    <div id="status"></div>
+    <div>
+      <button onclick="deleteVote()">Supprimer le vote de BEN AICHA Lina</button>
+      <button onclick="viewAllVotes()">Voir tous les votes</button>
+      <button class="delete-btn" onclick="deleteAllVotes()">Supprimer TOUS les votes</button>
+    </div>
+  </div>
+
+  <script>
+    const statusDiv = document.getElementById('status');
+
+    function deleteVote() {
+      const studentName = 'BEN AICHA Lina';
+      const voteData = localStorage.getItem(`votes_${studentName}`);
+      
+      if (voteData) {
+        localStorage.removeItem(`votes_${studentName}`);
+        statusDiv.innerHTML = `<div class="message success">✓ Vote de "${studentName}" supprimé avec succès !</div>`;
+      } else {
+        statusDiv.innerHTML = `<div class="message info">ℹ️ Aucun vote trouvé pour "${studentName}"</div>`;
+      }
+    }
+
+    function viewAllVotes() {
+      const allVotes = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('votes_')) {
+          const studentName = key.replace('votes_', '');
+          const data = JSON.parse(localStorage.getItem(key));
+          const voteCount = Object.keys(data.votes).length;
+          allVotes.push(`${studentName}: ${voteCount} vote(s)`);
+        }
+      }
+      
+      if (allVotes.length > 0) {
+        statusDiv.innerHTML = `<div class="message info"><strong>Votes enregistrés:</strong><br>${allVotes.join('<br>')}</div>`;
+      } else {
+        statusDiv.innerHTML = `<div class="message info">ℹ️ Aucun vote enregistré</div>`;
+      }
+    }
+
+    function deleteAllVotes() {
+      if (confirm('⚠️ Voulez-vous vraiment supprimer TOUS les votes ?')) {
+        const keysToDelete = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith('votes_')) {
+            keysToDelete.push(key);
+          }
+        }
+        
+        keysToDelete.forEach(key => localStorage.removeItem(key));
+        statusDiv.innerHTML = `<div class="message success">✓ ${keysToDelete.length} vote(s) supprimé(s) !</div>`;
+      }
+    }
+
+    // Afficher les votes au chargement
+    viewAllVotes();
+  </script>
+</body>
+</html>

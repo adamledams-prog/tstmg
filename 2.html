@@ -8,21 +8,179 @@
     body {
       margin: 0;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
       font-family: Arial, sans-serif;
-      background: linear-gradient(160deg, #eef4ff, #ffffff);
+      background: #d70000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
       animation: fadeIn 0.45s ease;
     }
 
-    h1 {
-      margin: 0;
-      padding: 20px 28px;
+    .container {
+      background: white;
+      padding: 30px;
       border-radius: 14px;
-      background: #ffffff;
-      color: #1e3a8a;
-      box-shadow: 0 8px 24px rgba(30, 58, 138, 0.12);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+      max-width: 600px;
+      width: 100%;
       animation: slideUp 0.4s ease;
+    }
+
+    h1 {
+      margin: 0 0 20px 0;
+      color: #1f2937;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .student-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .student-button {
+      padding: 14px 18px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+
+    .student-button:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .student-button:active {
+      transform: translateY(0);
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 10px 16px;
+      background: #6b7280;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.2s ease;
+    }
+
+    .back-button:hover {
+      background: #4b5563;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      max-width: 400px;
+      width: 90%;
+      animation: modalPop 0.3s ease;
+    }
+
+    @keyframes modalPop {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal h2 {
+      margin: 0 0 20px 0;
+      color: #1f2937;
+      font-size: 22px;
+    }
+
+    .modal label {
+      display: block;
+      margin-bottom: 8px;
+      color: #374151;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .modal input {
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      border: 2px solid #d1d5db;
+      border-radius: 8px;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    .modal input:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-validate {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-validate:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-cancel {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .btn-cancel:hover {
+      background: #d1d5db;
     }
 
     @keyframes fadeIn {
@@ -33,7 +191,7 @@
     @keyframes slideUp {
       from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(20px);
       }
       to {
         opacity: 1;
@@ -43,6 +201,122 @@
   </style>
 </head>
 <body>
-  <h1>TSTMG2</h1>
+  <div class="container">
+    <a href="index.html" class="back-button">← Retour</a>
+    <h1>Classe TSTMG2</h1>
+    <div class="student-list" id="studentList"></div>
+  </div>
+
+  <div class="modal" id="authModal">
+    <div class="modal-content">
+      <h2 id="modalTitle"></h2>
+      <label for="dateInput">Date de naissance (JJ/MM/AAAA)</label>
+      <input type="text" id="dateInput" maxlength="10" placeholder="JJ/MM/AAAA">
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+        <button class="btn-validate" onclick="validateDate()">Valider</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const students = [
+      { nom: "AIELLO Johan", date: "02/02/2008" },
+      { nom: "BEN ABDELMOULA Amine", date: "08/10/2008" },
+      { nom: "BEN HADJ SAAD Arcelane", date: "07/07/2008" },
+      { nom: "BENDJEDIA Sabrina", date: "04/06/2008" },
+      { nom: "BERGACHI Rania", date: "16/01/2008" },
+      { nom: "BRAMKI Rayyan", date: "27/11/2008" },
+      { nom: "COUTELLIER Ella", date: "04/12/2008" },
+      { nom: "DARMON Shanon", date: "21/04/2008" },
+      { nom: "GERARD-BENHAIM Sacha", date: "23/09/2008" },
+      { nom: "GONZALEZ Emma", date: "24/08/2008" },
+      { nom: "HAMIDA Rokaïa", date: "12/05/2008" },
+      { nom: "HEDHILI Lisa", date: "21/11/2008" },
+      { nom: "HERMETZ-BOSCHER Lorenzo", date: "18/12/2008" },
+      { nom: "LABATY Lucie", date: "25/03/2008" },
+      { nom: "LANTOINE Travis", date: "30/07/2008" },
+      { nom: "LAYOUNI Yacin", date: "16/02/2008" },
+      { nom: "MABROUK Selma", date: "22/05/2008" },
+      { nom: "PIET Virgile", date: "26/09/2008" },
+      { nom: "POULAIN Noa", date: "08/01/2008" },
+      { nom: "RAYMOND--MAÂOUI Esteban", date: "18/03/2008" },
+      { nom: "SANIEZ Lysa", date: "16/02/2008" },
+      { nom: "SEBA Lila", date: "04/09/2008" },
+      { nom: "TRAMICHEL--GARDEL Jean", date: "22/05/2007" }
+    ];
+
+    const studentList = document.getElementById('studentList');
+    const modal = document.getElementById('authModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const dateInput = document.getElementById('dateInput');
+    let currentStudent = null;
+
+    // Formatage automatique de la date
+    dateInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      
+      if (value.length >= 2) {
+        value = value.substring(0, 2) + '/' + value.substring(2);
+      }
+      if (value.length >= 5) {
+        value = value.substring(0, 5) + '/' + value.substring(5, 9);
+      }
+      
+      e.target.value = value;
+    });
+
+    // Validation avec la touche Entrée
+    dateInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        validateDate();
+      }
+    });
+
+    function openModal(student) {
+      currentStudent = student;
+      modalTitle.textContent = student.nom;
+      dateInput.value = '';
+      modal.classList.add('active');
+      setTimeout(() => dateInput.focus(), 100);
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+      currentStudent = null;
+    }
+
+    function validateDate() {
+      if (!currentStudent) return;
+      
+      const inputDate = dateInput.value;
+      
+      if (inputDate === currentStudent.date) {
+        alert('✓ Authentification réussie !');
+        // Sauvegarder le nom de l'élève et rediriger
+        const studentName = encodeURIComponent(currentStudent.nom);
+        window.location.href = `phototstmg2.html?student=${studentName}`;
+      } else {
+        alert('✗ Date de naissance incorrecte.');
+        dateInput.value = '';
+        dateInput.focus();
+      }
+    }
+
+    students.forEach(student => {
+      const button = document.createElement('button');
+      button.className = 'student-button';
+      button.textContent = student.nom;
+      button.addEventListener('click', () => openModal(student));
+      studentList.appendChild(button);
+    });
+
+    // Fermer la modal en cliquant en dehors
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+  </script>
 </body>
 </html>
