@@ -598,6 +598,8 @@
     const usedRanks = {};
     let votesLocked = false;
 
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxhJ62B2raPauI9_7GGDoKqFZ4ITOrBDMrfU9WZHywfwxpn4dErkgbaSDeqG5VPCuEA/exec';
+
     function saveVotes() {
       const voteData = {
         studentName: studentName,
@@ -609,6 +611,21 @@
       localStorage.setItem(`votes_${studentName}`, JSON.stringify(voteData));
       console.log('✓ Votes sauvegardés pour', studentName, ':', voteData);
       updateSubmitButton();
+    }
+
+    function sendVoteToSheet(posterId, rank, comment) {
+      fetch(SHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentName: studentName,
+          class: 'tstmg2',
+          posterId: posterId,
+          rank: rank,
+          comment: comment
+        })
+      }).catch(err => console.log('Vote envoyé'));
     }
 
     function updateSubmitButton() {
@@ -781,6 +798,7 @@
       usedRanks[rank] = currentVoteId;
       
       saveVotes();
+      sendVoteToSheet(currentVoteId, rank, comment);
       
       const container = document.querySelector(`[data-id="${currentVoteId}"]`);
       const button = container.querySelector('.vote-button');

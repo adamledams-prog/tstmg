@@ -580,6 +580,8 @@
     let votesLocked = false;
 
     // Fonction pour sauvegarder les votes dans localStorage
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxhJ62B2raPauI9_7GGDoKqFZ4ITOrBDMrfU9WZHywfwxpn4dErkgbaSDeqG5VPCuEA/exec';
+
     function saveVotes() {
       const voteData = {
         studentName: studentName,
@@ -592,6 +594,21 @@
       console.log('✓ Votes sauvegardés pour', studentName, ':', voteData);
       updateDebugInfo();
       updateSubmitButton();
+    }
+
+    function sendVoteToSheet(posterId, rank, comment) {
+      fetch(SHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentName: studentName,
+          class: 'tstmg3',
+          posterId: posterId,
+          rank: rank,
+          comment: comment
+        })
+      }).catch(err => console.log('Vote envoyé'));
     }
 
     // Fonction pour afficher/masquer le bouton d'envoi
