@@ -62,16 +62,39 @@
     .delete-btn:hover {
       background: #b91c1c;
     }
+    .sheet-link {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: #059669;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    .sheet-link:hover {
+      background: #047857;
+    }
+    .back-btn {
+      background: #6b7280;
+      margin-top: 20px;
+    }
+    .back-btn:hover {
+      background: #4b5563;
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>🗑️ Suppression de vote</h1>
+    <h1>🗑️ Gestion des votes</h1>
     <div id="status"></div>
     <div>
-      <button onclick="deleteVote()">Supprimer le vote de BEN AICHA Lina</button>
-      <button onclick="viewAllVotes()">Voir tous les votes</button>
-      <button class="delete-btn" onclick="deleteAllVotes()">Supprimer TOUS les votes</button>
+      <button onclick="viewAllVotes()">📊 Voir les votes localStorage</button>
+      <button class="delete-btn" onclick="deleteAllVotes()">🗑️ Supprimer TOUS les votes</button>
+      <br>
+      <a href="https://docs.google.com/spreadsheets/d/1C7iJkeWk1jr8lWRCO5APKnyaU3kSGCVCt27a1AUF5bw/edit" target="_blank" class="sheet-link">📈 Voir Google Sheet (Temps réel)</a>
+      <br>
+      <button class="back-btn" onclick="window.location.href='index.html'">← Retour accueil</button>
     </div>
   </div>
 

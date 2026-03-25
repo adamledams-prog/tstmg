@@ -43,6 +43,27 @@
       height: 120px !important;
     }
 
+    .admin-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(220, 38, 38, 0.1);
+      color: #dc2626;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 2px solid rgba(220, 38, 38, 0.3);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      z-index: 999;
+    }
+
+    .admin-button:hover {
+      background: rgba(220, 38, 38, 0.2);
+      transform: scale(1.05);
+    }
+
     @keyframes slideInRight {
       from {
         opacity: 0;
@@ -142,6 +163,8 @@
     <div id="qrcode"></div>
   </div>
 
+  <button class="admin-button" onclick="adminAccess()">🔧 Admin</button>
+
   <div class="card">
     <h1>Je suis un élève de</h1>
 
@@ -191,6 +214,16 @@
       qrImage.style.display = 'block';
       document.getElementById('qrcode').appendChild(qrImage);
     });
+
+    // Accès admin
+    function adminAccess() {
+      const password = prompt('Mot de passe admin :');
+      if (password === '5555') {
+        window.location.href = 'supprimer_vote_lina.html';
+      } else if (password !== null) {
+        alert('❌ Mot de passe incorrect');
+      }
+    }
   </script>
 </body>
 </html>
