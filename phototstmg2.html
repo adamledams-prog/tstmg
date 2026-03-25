@@ -96,13 +96,14 @@
     .photos-container {
       max-width: 1200px;
       margin: 0 auto;
+      padding: 0 10px;
     }
 
     .photos-row {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 30px;
-      justify-content: center;
-      align-items: center;
+      justify-items: center;
       margin-bottom: 30px;
     }
 
@@ -126,37 +127,49 @@
 
     /* Responsive pour mobile */
     @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
       h1 {
-        font-size: 28px;
+        font-size: 24px;
         padding: 0 10px;
+        margin: 10px 0;
       }
 
       .student-name {
-        font-size: 16px;
+        font-size: 14px;
+        margin-bottom: 20px;
       }
 
       .photos-row {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
+        grid-template-columns: 1fr !important;
+        gap: 25px;
       }
 
       .pdf-container {
-        width: 90%;
-        max-width: 400px;
+        width: 100%;
+        max-width: 100%;
       }
 
       .image-wrapper {
-        height: 450px;
+        height: 500px;
       }
 
       .submit-container {
-        padding: 15px;
+        padding: 15px 10px;
+        margin: 30px auto;
       }
 
       .submit-button {
-        padding: 14px 28px;
-        font-size: 16px;
+        width: 100%;
+        padding: 16px;
+        font-size: 18px;
+      }
+
+      .locked-message {
+        font-size: 14px;
+        padding: 12px;
       }
     }
 
