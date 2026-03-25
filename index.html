@@ -14,6 +14,44 @@
       margin: 0;
       background: #d70000;
       animation: fadeInBody 0.5s ease;
+      position: relative;
+    }
+
+    .qrcode-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      z-index: 1000;
+      animation: slideInRight 0.6s ease;
+    }
+
+    .qrcode-container p {
+      margin: 0 0 10px 0;
+      font-size: 12px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    #qrcode img {
+      display: block;
+      width: 120px !important;
+      height: 120px !important;
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
 
     .card {
@@ -23,46 +61,6 @@
       box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
       width: 340px;
       animation: popIn 0.45s ease;
-    }
-
-    .qr-section {
-      text-align: center;
-      margin-bottom: 20px;
-      padding-bottom: 20px;
-      border-bottom: 2px solid #e5e7eb;
-    }
-
-    .qr-title {
-      font-size: 14px;
-      color: #6b7280;
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
-
-    .qr-code {
-      display: inline-block;
-      padding: 10px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      margin-bottom: 10px;
-    }
-
-    #qrcode {
-      width: 150px;
-      height: 150px;
-    }
-
-    #qrcode img {
-      width: 100%;
-      height: 100%;
-    }
-
-    .site-url {
-      font-size: 11px;
-      color: #2563eb;
-      word-break: break-all;
-      margin-top: 5px;
     }
 
     h1 {
@@ -139,15 +137,12 @@
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="qr-section">
-      <div class="qr-title">📱 Scanne pour accéder au site</div>
-      <div class="qr-code">
-        <div id="qrcode"></div>
-      </div>
-      <div class="site-url" id="siteUrl"></div>
-    </div>
+  <div class="qrcode-container">
+    <p>📱 Scanne-moi</p>
+    <div id="qrcode"></div>
+  </div>
 
+  <div class="card">
     <h1>Je suis un élève de</h1>
 
     <form id="classeForm">
@@ -164,38 +159,7 @@
     </form>
   </div>
 
-  <!-- Bibliothèque QRCode.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  
   <script>
-    // Générer le QR code avec l'URL du site
-    const githubUrl = 'https://adamledams-prog.github.io/tstmg/';
-    
-    // Déterminer l'URL du site
-    let urlToUse;
-    if (window.location.hostname === 'adamledams-prog.github.io') {
-      urlToUse = githubUrl;
-    } else if (window.location.protocol === 'file:') {
-      // En local, utiliser l'URL GitHub
-      urlToUse = githubUrl;
-    } else {
-      // Sur un serveur local
-      urlToUse = window.location.origin + window.location.pathname.replace('index.html', '');
-    }
-    
-    // Générer le QR code
-    new QRCode(document.getElementById("qrcode"), {
-      text: urlToUse,
-      width: 150,
-      height: 150,
-      colorDark: "#000000",
-      colorLight: "#ffffff",
-      correctLevel: QRCode.CorrectLevel.H
-    });
-    
-    // Afficher l'URL
-    document.getElementById('siteUrl').textContent = urlToUse;
-
     // Gestion du formulaire
     const form = document.getElementById('classeForm');
     const select = document.getElementById('classe');
@@ -216,6 +180,16 @@
           alert('Mot de passe incorrect.');
         }
       }
+    });
+
+    // Générer le QR code dynamiquement via API
+    window.addEventListener('DOMContentLoaded', function() {
+      const currentUrl = window.location.href;
+      const qrImage = document.createElement('img');
+      qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(currentUrl)}`;
+      qrImage.alt = 'QR Code';
+      qrImage.style.display = 'block';
+      document.getElementById('qrcode').appendChild(qrImage);
     });
   </script>
 </body>
