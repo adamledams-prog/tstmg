@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Choix des photos</title>
+  <link rel="stylesheet" href="stile.css">
   <style>
     body {
       margin: 0;
       min-height: 100vh;
       font-family: Arial, sans-serif;
-      background: #d70000;
       padding: 20px;
       animation: fadeIn 0.5s ease;
     }
@@ -370,6 +370,50 @@
       background: #d1d5db;
     }
 
+    .send-vote-btn {
+      margin-top: 16px;
+      padding: 14px;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 16px;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .send-vote-btn:hover:not(:disabled) {
+      background: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .send-vote-btn:disabled {
+      background: #d1d5db;
+      color: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .vote-option.selected {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+    }
+
+    .vote-option.selected.first {
+      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.6);
+    }
+
+    .vote-option.selected.second {
+      box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.6);
+    }
+
+    .vote-option.selected.third {
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.6);
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -550,14 +594,15 @@
     <div class="modal-content">
       <h2 id="modalTitle">Voter pour cette affiche</h2>
       <div class="vote-options">
-        <div class="vote-option first" data-rank="1er" onclick="confirmVote('1er')">🥇 1er</div>
-        <div class="vote-option second" data-rank="2ème" onclick="confirmVote('2ème')">🥈 2ème</div>
-        <div class="vote-option third" data-rank="3ème" onclick="confirmVote('3ème')">🥉 3ème</div>
+        <div class="vote-option first" data-rank="1er" onclick="selectRank('1er')">🥇 1er</div>
+        <div class="vote-option second" data-rank="2ème" onclick="selectRank('2ème')">🥈 2ème</div>
+        <div class="vote-option third" data-rank="3ème" onclick="selectRank('3ème')">🥉 3ème</div>
       </div>
       <div class="comment-section">
         <label for="voteComment">Explique les raisons de ton choix (optionnel)</label>
         <textarea id="voteComment" placeholder="Pourquoi as-tu choisi cette affiche ?"></textarea>
       </div>
+      <button id="sendVoteBtn" class="send-vote-btn" onclick="confirmVote()" disabled>📤 Envoyer le vote</button>
       <button class="modal-close" onclick="closeVoteModal()">Annuler</button>
     </div>
   </div>
@@ -603,7 +648,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           studentName: studentName,
-          class: 'tstmg3',
+          class: 'tstmg2',
           posterId: posterId,
           rank: rank,
           comment: comment
@@ -770,15 +815,57 @@
     }
 
     function closeVoteModal() {
-      document.getElementById('voteModal').classList.remove('active');
+      const modal = document.getElementById('voteModal');
+      const modalContent = modal.querySelector('.modal-content');
+      const commentField = document.getElementById('voteComment');
+      const sendBtn = document.getElementById('sendVoteBtn');
+      
+      modal.classList.remove('active');
+      modalContent.classList.remove('modal-sending');
+      commentField.classList.remove('comment-focus');
+      sendBtn.classList.remove('vote-sending');
+      
       currentVoteId = null;
       selectedRank = '';
+      commentField.value = '';
+      sendBtn.disabled = true;
+      document.querySelectorAll('.vote-option').forEach(opt => {
+        opt.classList.remove('selected');
+      });
     }
 
-    function confirmVote(rank) {
+    function selectRank(rank) {
       selectedRank = rank;
+      
+      // Mettre à jour l'apparence des boutons
+      document.querySelectorAll('.vote-option').forEach(opt => {
+        opt.classList.remove('selected');
+      });
+      document.querySelector(`[data-rank="${rank}"]`).classList.add('selected');
+      
+      // Activer le bouton d'envoi
+      document.getElementById('sendVoteBtn').disabled = false;
+    }
+
+    function confirmVote() {
+      if (!selectedRank) return;
+      
       const commentField = document.getElementById('voteComment');
       const comment = commentField.value.trim();
+      const sendBtn = document.getElementById('sendVoteBtn');
+      const modal = document.getElementById('voteModal');
+      const modalContent = modal.querySelector('.modal-content');
+      
+      // Animation du bouton d'envoi
+      sendBtn.classList.add('vote-sending');
+      
+      // Animation du modal
+      modalContent.classList.add('modal-sending');
+      
+      // Animation du champ de commentaire si rempli
+      if (comment) {
+        commentField.classList.add('comment-focus');
+      }
       
       // Si l'image actuelle avait déjà un vote, libérer l'ancien rang
       if (votes[currentVoteId]) {
@@ -787,8 +874,8 @@
       }
       
       // Si ce rang était déjà attribué à une autre affiche, la retirer
-      if (usedRanks[rank] && usedRanks[rank] !== currentVoteId) {
-        const oldImageId = usedRanks[rank];
+      if (usedRanks[selectedRank] && usedRanks[selectedRank] !== currentVoteId) {
+        const oldImageId = usedRanks[selectedRank];
         
         // Retirer le vote de l'ancienne affiche
         delete votes[oldImageId];
@@ -808,13 +895,16 @@
       
       // Enregistrer le vote avec le commentaire
       votes[currentVoteId] = { 
-        rank: rank,
+        rank: selectedRank,
         comment: comment 
       };
-      usedRanks[rank] = currentVoteId;
+      usedRanks[selectedRank] = currentVoteId;
       
       // Sauvegarder dans localStorage
       saveVotes();
+      
+      // Envoyer à Google Sheets
+      sendVoteToSheet(currentVoteId, selectedRank, comment);
       
       // Mettre à jour l'affichage de l'affiche actuelle
       const container = document.querySelector(`[data-id="${currentVoteId}"]`);
@@ -828,7 +918,7 @@
       // Ajouter nouveau badge
       const badge = document.createElement('div');
       badge.className = 'vote-badge';
-      badge.textContent = rank;
+      badge.textContent = selectedRank;
       if (comment) {
         badge.title = comment;
         badge.style.cursor = 'help';
@@ -836,13 +926,17 @@
       imageWrapper.appendChild(badge);
       
       // Changer le bouton
-      button.textContent = 'Voté : ' + rank;
-      button.classList.add('voted');
+      button.textContent = 'Voté : ' + selectedRank;
+      button.classList.add('voted', 'vote-success');
       if (comment) {
         button.title = comment;
       }
       
-      closeVoteModal();
+      // Attendre la fin de l'animation avant de fermer
+      setTimeout(() => {
+        modalContent.classList.remove('modal-sending');
+        closeVoteModal();
+      }, 400);
     }
 
     // Fermer la modal en cliquant en dehors

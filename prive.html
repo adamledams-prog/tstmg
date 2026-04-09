@@ -4,20 +4,59 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Résultats des votes</title>
+  <link rel="stylesheet" href="stile.css">
   <link rel="stylesheet" href="prive.css">
 </head>
 <body>
+  <!-- Indicateur de participation -->
+  <div class="participation-indicator" id="participationIndicator">
+    <div class="participation-circle">
+      <svg class="participation-ring" viewBox="0 0 100 100">
+        <circle class="ring-background" cx="50" cy="50" r="45"></circle>
+        <circle class="ring-progress" cx="50" cy="50" r="45" id="progressRing"></circle>
+      </svg>
+      <div class="participation-text">
+        <div class="participation-percent" id="participationPercent">0%</div>
+        <div class="participation-label">ont voté</div>
+      </div>
+    </div>
+    <div class="participation-details" id="participationDetails">0/0 élèves</div>
+  </div>
+
+  <div class="comments-panel">
+    <h3>💬 Commentaires</h3>
+    <div id="commentsDisplay"></div>
+  </div>
+
   <div class="container">
     <h1>🏆 Résultats des votes</h1>
     
     <div class="class-selector">
       <button class="class-btn active" onclick="showResults('tstmg2')">TSTMG2</button>
       <button class="class-btn" onclick="showResults('tstmg3')">TSTMG3</button>
+
     </div>
 
     <div id="resultsContainer"></div>
   </div>
 
+  <!-- Bouton retour en haut -->
+  <button class="back-to-top" id="backToTop" onclick="scrollToTop()" title="Retour en haut">
+    ⬆️
+  </button>
+
+  <!-- Robot Assistant -->
+  <div class="robot-assistant">
+    <div class="robot-message" id="robotMessage">
+      <button class="robot-close" onclick="hideRobotMessage()">✕</button>
+      <p class="robot-message-text"></p>
+    </div>
+    <div class="robot-body" onclick="toggleRobotMessage()">
+      🤖
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
   <script src="prive.js"></script>
 </body>
 </html>
